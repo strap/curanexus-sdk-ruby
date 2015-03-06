@@ -75,7 +75,5 @@ class StrapSDKResource
 
     content = JSON.parse(response.body)
   end
-
-
-
+  
 end
