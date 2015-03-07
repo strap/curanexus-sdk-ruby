@@ -28,7 +28,7 @@ Below is a basic use case.
 
 ```ruby
 # Require the StrapSDK
-require "~/mysrc/strap-sdk-rails/lib/strapSDK.rb"
+require "lib/strapSDK.rb"
 
 # Setup Strap SDK
 strap = StrapSDK.new("Read Token Project Value")
