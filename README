@@ -27,20 +27,22 @@ git clone git@github.com:strap/strap-sdk-ruby.git
 Below is a basic use case.
 
 ```ruby
-// Require the StrapSDK
+# Require the StrapSDK
 require "~/mysrc/strap-sdk-rails/lib/strapSDK.rb"
 
-// Setup Strap SDK
+# Setup Strap SDK
 strap = StrapSDK.new("Read Token Project Value")
 
-// Get the data for today
+# Get the data for today
 puts strap.api("today", ["guid"=>"sdfasdfasdf", "page"=>1])  # optional second array
 
-// Get a specfic report
+# Get a specfic report by ID
 puts strap.api("report",["id"=>"asdfasdfasdfasdf"]) # id required
 
+# Get all activity for a date
 puts strap.api("activity",["guid"=>"sdfasdfasdf", "day"=>"YYYY-MM-DD", "count" => 500]) #guid is required
 
+# Get a user list
 puts strap.api("users", ["platform"=>"fitbit", "count"=>100])  # optional second array
 
 ```
