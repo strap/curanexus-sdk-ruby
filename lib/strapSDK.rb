@@ -1,7 +1,7 @@
 require 'net/http'
 require 'net/https'
-require "uri"
 require "json"
+require "cgi"
 
 class StrapSDK
   
@@ -64,16 +64,57 @@ class StrapSDKResource
 
   end
 
-  def use(params=[])
+  def use(params={})
 
-    # Implement replace of uri params
+    # Force hash type
+    params = ( params.length > 0 ) ? params : Hash.new()
+
+    # Replace of uri params
+    match = @path.scan(/{([^{}]+)}/i)
+
+    # Setup path to mess with
+    my_path = @path
+
+    # Matches returns 
+    # [ [ "guid" ] ]
+
+    # Handle all the URL strings
+    if match.length > 0
+
+      # Fix the Ruby return
+      match = match[0][0]
+
+      # Get valure to replace with or default to clear the param fir the uri
+      val = ( params.has_key?(match) ) ? params[match] : ""
+
+      # Do the actual replacement
+      my_path = my_path.gsub( "{" + match + "}", val)
+
+      # Remove the value from the params
+      if params.has_key?(match)
+        params.delete(match);
+      end
+
+    end
+
+    # See if we have params to query-up
+    if params.length > 0
+        querystring = params.map{ |k,v| "#{CGI.escape(k)}=#{CGI.escape(v.to_s)}" }.join("&")
+
+        my_path = my_path + '?' + querystring;
+    end
+
+    # Final Path
+    fin_path = my_path || @path
+
+    # puts fin_path
 
     # make the call
     http = Net::HTTP.new(@uri, 443)
     http.use_ssl = true
-    response = http.get2(@path, {"X-Auth-Token" => @token})
+    response = http.get2(fin_path, {"X-Auth-Token" => @token})
 
-    content = JSON.parse(response.body)
+    content = JSON.parse(response.body || "[]")
   end
   
 end
