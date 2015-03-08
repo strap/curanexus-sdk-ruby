@@ -15,9 +15,9 @@ class Launcher
 
 		puts strap.api("report")
 
-		puts strap.api("activity")
+		puts strap.api("activity",{"guid" => "brian-test"})
 
-		puts strap.api("users")
+		puts strap.api("users",{})
 
 	end
 
