@@ -33,16 +33,39 @@ require "lib/strapSDK.rb"
 # Setup Strap SDK
 strap = StrapSDK.new("Read Token Project Value")
 
-# Get the data for today
-puts strap.api("today", {"guid"=>"sdfasdfasdf", "page"=>1})  # optional second array
+# List available endpoints
+puts strap.endpoints();
+# No Params
 
-# Get a specfic report by ID
-puts strap.api("report",{"id"=>"asdfasdfasdfasdf"}) # id required
+# Optional Param can be passed in as an array
+# strap.getActivity( ["day" => "YYYY-MM-DD", "guid" => "demo-strap"] )
+# URL resources can be passed as Strings or in the Array
+# strap.getActivity( "demo-strap" )
 
-# Get all activity for a date
-puts strap.api("activity", {"guid"=>"sdfasdfasdf", "day"=>"YYYY-MM-DD", "count" => 500}) #guid is required
+# Fetch a user's activity
+# URL resource: "guid"
+# Optional: "day", "count"
+puts strap.getActivity({"guid" => "brian-test"})
+# Same as puts strap.getActivity("brian-test")
 
-# Get a user list
-puts strap.api("users", {"platform"=>"fitbit", "count"=>100 })  # optional second array
+# Fetch a report's data
+# URL resource: "id"
+# Optional: none
+puts strap.getReport()
+
+# Fetch all user data for today
+# URL resource: none
+# Optional: "guid", "page"
+puts strap.getToday()
+
+# Fetch trigger data
+# URL resource: "id"
+# Optional: "count"
+puts strap.getTrigger()
+
+# Fetch a user list for the Project
+# URL resource: none
+# Optional: "platform", "count"
+puts strap.getUsers()
 
 ```
