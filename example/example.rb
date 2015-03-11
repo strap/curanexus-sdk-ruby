@@ -7,17 +7,44 @@ class Launcher
 
 	def initialize( ) 
 
-		require "~/mysrc/strap-sdk-rails/lib/strapSDK.rb"
+		require "~/mysrc/strap-sdk-rails/lib/strap.rb"
 
-		strap = StrapSDK.new("QNIODsZ4pPRbeLlEsXElu3W7C0zjS2W3")
+		strap = Strap.new("{ Project Read Token }")
 
-		puts strap.api("today")
+		# List available endpoints
+	    puts strap.endpoints();
+	    # No Params
 
-		puts strap.api("report")
+		# Optional Param can be passed in as an array
+	    # strap.getActivity( ["day" => "YYYY-MM-DD", "guid" => "demo-strap"] )
+	    # URL resources can be passed as Strings or in the Array
+	    # strap.getActivity( "demo-strap" )
 
-		puts strap.api("activity",{"guid" => "brian-test"})
+		# Fetch a user's activity
+		# URL resource: "guid"
+		# Optional: "day", "count"
+		puts strap.getActivity({"guid" => "brian-test"})
+		# Same as puts strap.getActivity("brian-test")
 
-		puts strap.api("users",{})
+		# Fetch a report's data
+		# URL resource: "id"
+		# Optional: none
+		puts strap.getReport()
+
+		# Fetch all user data for today
+		# URL resource: none
+		# Optional: "guid", "page"
+		puts strap.getToday()
+
+		# Fetch trigger data
+		# URL resource: "id"
+		# Optional: "count"
+		puts strap.getTrigger()
+
+		# Fetch a user list for the Project
+		# URL resource: none
+		# Optional: "platform", "count"
+		puts strap.getUsers()
 
 	end
 

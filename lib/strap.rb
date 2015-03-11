@@ -3,14 +3,24 @@ require 'net/https'
 require "json"
 require "cgi"
 
-class StrapSDK
+class Strap
   
   @@token = ""
 
   $strapAPI = "api2.straphq.com"
   @@path = "/discover"
 
+  @@map = {
+    "activity" => "getActivity",
+    "report" => "getReport",
+    "today" => "getToday",
+    "trigger" => "getTrigger",
+    "users" => "getUsers"
+  }
+
   @@apis = {}
+
+  @@resources = {}
 
   def initialize(token=false)
     if !token 
@@ -28,20 +38,39 @@ class StrapSDK
 
     content.each do |k, v|
       puts k
-      @@apis[k] = StrapSDKResource.new( @@token, k, v )
+      @@apis[k] = StrapResource.new( @@token, k, v )
+
+      @@resources[ @@map[k] ] = v
     end
   end
 
-  def api(name, params=[])
-    if name && @@apis[name]
-      return @@apis[name].use(params)
-    else
-      puts "Invalid Resource"
-    end
+  def endpoints
+    @@resources
   end
+
+  def getActivity(params=[])
+      @@apis["activity"].use(params)
+  end
+
+  def getReport(params=[])
+      @@apis["report"].use(params)
+  end
+
+  def getToday(params=[])
+      @@apis["today"].use(params)
+  end
+
+  def getTrigger(params=[])
+      @@apis["trigger"].use(params)
+  end
+
+  def getUsers(params=[])
+      @@apis["users"].use(params)
+  end
+
 end
 
-class StrapSDKResource 
+class StrapResource 
 
   attr_accessor :token
   attr_accessor :name
@@ -67,7 +96,9 @@ class StrapSDKResource
   def use(params={})
 
     # Force hash type
-    params = ( params.length > 0 ) ? params : Hash.new()
+    if !params.is_a?(String)
+      params = ( params.length > 0 ) ? params : Hash.new()
+    end 
 
     # Replace of uri params
     match = @path.scan(/{([^{}]+)}/i)
@@ -85,14 +116,19 @@ class StrapSDKResource
       match = match[0][0]
 
       # Get valure to replace with or default to clear the param fir the uri
-      val = ( params.has_key?(match) ) ? params[match] : ""
+      if params.is_a?(String)
+        val = params
+        params = Hash.new()  # Make sure to overwrite it with new Hash
+      else
+        val = ( params.has_key?(match) ) ? params[match] : ""
+      end
 
       # Do the actual replacement
       my_path = my_path.gsub( "{" + match + "}", val)
 
       # Remove the value from the params
       if params.has_key?(match)
-        params.delete(match);
+          params.delete(match);
       end
 
     end
@@ -106,8 +142,6 @@ class StrapSDKResource
 
     # Final Path
     fin_path = my_path || @path
-
-    # puts fin_path
 
     # make the call
     http = Net::HTTP.new(@uri, 443)
