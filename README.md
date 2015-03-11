@@ -1,4 +1,4 @@
-# Strap SDK Ruby
+# Ruby > Strap Server-Side SDK
 
 Strap SDK Ruby provides an easy to use, chainable API for interacting with our
 API services.  Its purpose is to abstract away resource information from
