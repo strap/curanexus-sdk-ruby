@@ -27,11 +27,11 @@ git clone git@github.com:strap/strap-sdk-ruby.git
 Below is a basic use case.
 
 ```ruby
-# Require the StrapSDK
-require "lib/strapSDK.rb"
+# Require the Strap
+require "lib/strap.rb"
 
 # Setup Strap SDK
-strap = StrapSDK.new("Read Token Project Value")
+strap = Strap.new("Read Token Project Value")
 
 # List available endpoints
 puts strap.endpoints();
