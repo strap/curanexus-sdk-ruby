@@ -7,7 +7,7 @@ class Launcher
 
 	def initialize( ) 
 
-		require "~/mysrc/strap-sdk-rails/lib/strap.rb"
+		require "./lib/strap.rb"
 
 		strap = Strap.new("{ Project Read Token }")
 
