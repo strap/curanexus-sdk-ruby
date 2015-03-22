@@ -48,6 +48,11 @@ puts strap.endpoints();
 puts strap.getActivity({"guid" => "brian-test"})
 # Same as puts strap.getActivity("brian-test")
 
+# Fetch all user data for month
+# URL resource: none
+# Optional: "guid", "page", "per_page"
+puts strap.getMonth)
+
 # Fetch a report's data
 # URL resource: "id"
 # Optional: none
@@ -55,7 +60,7 @@ puts strap.getReport()
 
 # Fetch all user data for today
 # URL resource: none
-# Optional: "guid", "page"
+# Optional: "guid", "page", "per_page"
 puts strap.getToday()
 
 # Fetch trigger data
@@ -67,5 +72,10 @@ puts strap.getTrigger()
 # URL resource: none
 # Optional: "platform", "count"
 puts strap.getUsers()
+
+# Fetch all user data for week
+# URL resource: none
+# Optional: "guid", "page", "per_page"
+puts strap.getWeek()
 
 ```

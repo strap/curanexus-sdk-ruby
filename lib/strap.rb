@@ -52,6 +52,10 @@ class Strap
       @@apis["activity"].use(params)
   end
 
+  def getMonth(params=[])
+      @@apis["month"].use(params)
+  end
+
   def getReport(params=[])
       @@apis["report"].use(params)
   end
@@ -66,6 +70,10 @@ class Strap
 
   def getUsers(params=[])
       @@apis["users"].use(params)
+  end
+
+  def getWeek(params=[])
+      @@apis["week"].use(params)
   end
 
 end
