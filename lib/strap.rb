@@ -10,17 +10,18 @@ class Strap
   $strapAPI = "api2.straphq.com"
   @@path = "/discover"
 
-  @@map = {
-    "activity" => "getActivity",
-    "report" => "getReport",
-    "today" => "getToday",
-    "trigger" => "getTrigger",
-    "users" => "getUsers"
-  }
-
   @@apis = {}
 
   @@resources = {}
+
+  # Method Placeholders
+  @@activity = {}
+  @@month = {}
+  @@report = {}
+  @@today = {}
+  @@trigger = {}
+  @@users = {}
+  @@week = {}
 
   def initialize(token=false)
     if !token 
@@ -37,10 +38,30 @@ class Strap
     content = JSON.parse(response.body)
 
     content.each do |k, v|
-      puts k
-      @@apis[k] = StrapResource.new( @@token, k, v )
+      # puts k
 
-      @@resources[ @@map[k] ] = v
+      @@resources[ k ] = v
+
+      case k
+      when "activity"
+        @@activity = StrapResource.new( @@token, v )
+      when "month"
+        @@month = StrapResource.new( @@token, v )
+      when "report"
+        @@report = StrapResource.new( @@token, v )
+      when "month"
+        @@month = StrapResource.new( @@token, v )
+      when "today"
+        @@today = StrapResource.new( @@token, v )
+        when "trigger"
+        @@trigger = StrapResource.new( @@token, v )
+      when "users"
+        @@users = StrapResource.new( @@token, v )
+      when "week"
+        @@week = StrapResource.new( @@token, v )
+      else
+        #do nothing
+      end
     end
   end
 
@@ -48,32 +69,27 @@ class Strap
     @@resources
   end
 
-  def getActivity(params=[])
-      @@apis["activity"].use(params)
+  # Hook up the methods on the main class
+  def activity 
+    return @@activity 
   end
-
-  def getMonth(params=[])
-      @@apis["month"].use(params)
+  def month 
+    return @@month 
   end
-
-  def getReport(params=[])
-      @@apis["report"].use(params)
+  def report 
+    return @@report 
   end
-
-  def getToday(params=[])
-      @@apis["today"].use(params)
+  def today 
+    return @@today 
   end
-
-  def getTrigger(params=[])
-      @@apis["trigger"].use(params)
+  def trigger 
+    return @@trigger 
   end
-
-  def getUsers(params=[])
-      @@apis["users"].use(params)
+  def users 
+    return @@users 
   end
-
-  def getWeek(params=[])
-      @@apis["week"].use(params)
+  def week 
+    return @@week 
   end
 
 end
@@ -81,38 +97,104 @@ end
 class StrapResource 
 
   attr_accessor :token
-  attr_accessor :name
   attr_accessor :uri
   attr_accessor :method
   attr_accessor :req
   attr_accessor :opt
+  attr_accessor :hasNext
+  attr_accessor :params
+  attr_accessor :pageData
+  attr_accessor :pageDefault
+  attr_accessor :suppress
 
-  def initialize(token,name,details)
+  def initialize(token,details)
     # split part the uri to grab the path
     parts = details["uri"].split($strapAPI)
 
     @token = token
-    @name = name
     @uri = $strapAPI
     @path = parts[1]
     @method = details["method"]
     @req = details["required"]
-    @opt = details["optional"]
+    @opt = details["optional"] || []
+    @pageData = {};
+    @pageDefault = {
+                    "page" => 1,
+                    "pages" => 1,
+                    "next" => 2,
+                    "per_page" => 30
+                  }
 
+    # Skip next and getAll on non page'd resources
+    if !@opt || @opt.count('page') == 0
+      @suppress = true
+    end
   end
 
-  def use(params={})
+  def next
+    # This method should not being doing this...
+    if @suppress 
+      return false;
+    end
 
-    # Force hash type
-    if !params.is_a?(String)
-      params = ( params.length > 0 ) ? params : Hash.new()
-    end 
+    if @hasNext 
+
+      page = { 
+                "page"      => @pageData["next"],
+                "per_page"  => @pageData["per_page"]
+              }
+
+      return self.get( @params, page);
+    else 
+      return false;
+    end
+  end
+
+  def getAll(params={})
+
+    # This method should not being doing this...
+    if @suppress 
+      return false;
+    end
+    
+    data = self.get(params)
+
+    while @hasNext
+      data = data.merge( self.next() )
+    end
+
+    data
+  end
+
+  def get(params={},page={})
 
     # Replace of uri params
     match = @path.scan(/{([^{}]+)}/i)
 
     # Setup path to mess with
     my_path = @path
+
+    # Store this for next()
+    @params = params
+
+    # Check the type of params
+    if  params && params.is_a?(String) # Check for only string
+        paramString = params
+        params = Hash.new()
+    end
+
+    # Setup the Paging info in the request
+    temp_page = {
+                "page" => ( params["page"] ) ? params["page"] : @pageDefault["page"],
+                "per_page" => ( params["per_page"] ) ? params["per_page"] : @pageDefault["per_page"]
+    }
+
+    # Merge them together
+    @pageData = temp_page.merge(page)
+
+    # Merge the page data into request
+    # Give preference to params
+    params = @pageData.merge(params)
 
     # Matches returns 
     # [ [ "guid" ] ]
@@ -124,12 +206,13 @@ class StrapResource
       match = match[0][0]
 
       # Get valure to replace with or default to clear the param fir the uri
-      if params.is_a?(String)
-        val = params
-        params = Hash.new()  # Make sure to overwrite it with new Hash
+      if paramString 
+        val = paramString
       else
         val = ( params.has_key?(match) ) ? params[match] : ""
       end
+
+      puts val
 
       # Do the actual replacement
       my_path = my_path.gsub( "{" + match + "}", val)
@@ -155,6 +238,21 @@ class StrapResource
     http = Net::HTTP.new(@uri, 443)
     http.use_ssl = true
     response = http.get2(fin_path, {"X-Auth-Token" => @token})
+
+    # Handle the Page Headers
+    if response["X-Pages"] == response["X-Page"]
+        @hasNext = false;
+        # Reset the Default Page information
+        @pageData = @pageDefault;
+    else
+        # Set the main pageData
+        @pageData = @pageData.merge({   "page"   => response["X-Page"],
+                                        "pages"  => response["X-Pages"],
+                                        "next"   => response["X-Next-Page"]
+                                    })
+
+        @hasNext = true;
+    end
 
     content = JSON.parse(response.body || "[]")
   end
