@@ -150,7 +150,7 @@ class StrapResource
     end
   end
 
-  def getAll(params={})
+  def all(params={})
 
     # This method should not being doing this...
     if @suppress 
