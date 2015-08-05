@@ -9,11 +9,10 @@ class Launcher
 
 		require "./lib/strap.rb"
 
-		#strap = Strap.new("{ Project Read Token }")
-		strap = Strap.new("QNIODsZ4pPRbeLlEsXElu3W7C0zjS2W3")
+		strap = Strap.new("{ Project Read Token }")
 
 		# List available endpoints
-	    # puts strap.endpoints();
+	     puts strap.endpoints();
 	    # No Params
 
 	    # Each endpoint that supports the "page" value also exposes two additional methods and two detail values
@@ -38,6 +37,24 @@ class Launcher
 		# Same as 
 		puts strap.activity.get("brian-test")
 
+		# Fetch a user's behavior
+		# URL resource: "guid"
+		# Optional: none
+		puts strap.behavior.get({"guid" => "brian-test"})
+		# Same as 
+		puts strap.behavior.get("brian-test")
+
+		# Fetch a list of micro-segmentation or specific segmentation job
+		# URL resource: "jobId"
+		# Optional: "jobId", "status"
+		puts strap.job.get()
+
+		# Create a micro-segmentation job
+		# URL resource: none
+		# Required: "name"
+		# Optional: "description",, "guids" "startDate", "endDate", "notificationUrl" >> Guid is array of strings
+		puts strap.job.post()
+
 		# Fetch all user data for the month
 		# URL resource: none
 		# Optional: "guid", "page", "per_page"
@@ -48,6 +65,11 @@ class Launcher
 		# Optional: none
 		puts strap.report.get("report - id value")
 
+		# Fetch a report's raw data
+		# URL resource: "id"
+		# Optional: none
+		puts strap.raw.get("report - id value")
+
 		# Fetch all user data for today
 		# URL resource: none
 		# Optional: "guid", "page", "per_page"
@@ -57,6 +79,13 @@ class Launcher
 		# URL resource: "id"
 		# Optional: "count"
 		puts strap.trigger.get()
+
+		# Fetch a simple user object
+		# URL resource: "guid"
+		# Optional: none
+		puts strap.user.get({"guid" => "brian-test"})
+		# Same as 
+		puts strap.user.get("brian-test")
 
 		# Fetch a user list for the Project
 		# URL resource: none
