@@ -16,10 +16,14 @@ class Strap
 
   # Method Placeholders
   @@activity = {}
+  @@behavior = {}
+  @@job = {}
   @@month = {}
+  @@raw = {}
   @@report = {}
   @@today = {}
   @@trigger = {}
+  @@user = {}
   @@users = {}
   @@week = {}
 
@@ -45,16 +49,24 @@ class Strap
       case k
       when "activity"
         @@activity = StrapResource.new( @@token, v )
+      when "behavior"
+        @@behavior = StrapResource.new( @@token, v )
+      when "job"
+        @@job = StrapResource.new( @@token, v )
       when "month"
         @@month = StrapResource.new( @@token, v )
+      when "raw"
+        @@raw = StrapResource.new( @@token, v )
       when "report"
         @@report = StrapResource.new( @@token, v )
-      when "month"
-        @@month = StrapResource.new( @@token, v )
+      when "segmentation"
+        @@segmentation = StrapResource.new( @@token, v )
       when "today"
         @@today = StrapResource.new( @@token, v )
-        when "trigger"
+      when "trigger"
         @@trigger = StrapResource.new( @@token, v )
+      when "user"
+        @@user = StrapResource.new( @@token, v )
       when "users"
         @@users = StrapResource.new( @@token, v )
       when "week"
@@ -73,8 +85,17 @@ class Strap
   def activity 
     return @@activity 
   end
+  def behavior 
+    return @@behavior 
+  end
+  def job 
+    return @@job 
+  end
   def month 
     return @@month 
+  end
+  def raw 
+    return @@raw 
   end
   def report 
     return @@report 
@@ -84,6 +105,9 @@ class Strap
   end
   def trigger 
     return @@trigger 
+  end
+  def user 
+    return @@user 
   end
   def users 
     return @@users 
@@ -97,10 +121,8 @@ end
 class StrapResource 
 
   attr_accessor :token
+  attr_accessor :details
   attr_accessor :uri
-  attr_accessor :method
-  attr_accessor :req
-  attr_accessor :opt
   attr_accessor :hasNext
   attr_accessor :params
   attr_accessor :pageData
@@ -108,15 +130,11 @@ class StrapResource
   attr_accessor :suppress
 
   def initialize(token,details)
-    # split part the uri to grab the path
-    parts = details["uri"].split($strapAPI)
 
     @token = token
+    @details = details
+
     @uri = $strapAPI
-    @path = parts[1]
-    @method = details["method"]
-    @req = details["required"]
-    @opt = details["optional"] || []
     @pageData = {};
     @pageDefault = {
                     "page" => 1,
@@ -125,8 +143,9 @@ class StrapResource
                     "per_page" => 30
                   }
 
+    val = self.pullMethod("GET")
     # Skip next and getAll on non page'd resources
-    if !@opt || @opt.count('page') == 0
+    if !val || val.count('page') == 0
       @suppress = true
     end
   end
@@ -168,11 +187,20 @@ class StrapResource
 
   def get(params={},page={})
 
-    # Replace of uri params
-    match = @path.scan(/{([^{}]+)}/i)
+    details = self.pullMethod("GET")
 
-    # Setup path to mess with
-    my_path = @path
+    # split part the uri to grab the path
+    parts = details["uri"].split($strapAPI)
+
+    my_path = parts[1]
+    method = details["method"]
+
+    if method != "GET"
+      return {"error"=>"method not allowed"}
+    end
+
+    # Replace of uri params
+    match = my_path.scan(/{([^{}]+)}/i)
 
     # Store this for next()
     @params = params
@@ -231,13 +259,10 @@ class StrapResource
         my_path = my_path + '?' + querystring;
     end
 
-    # Final Path
-    fin_path = my_path || @path
-
     # make the call
     http = Net::HTTP.new(@uri, 443)
     http.use_ssl = true
-    response = http.get2(fin_path, {"X-Auth-Token" => @token})
+    response = http.get2(my_path, {"X-Auth-Token" => @token})
 
     # Handle the Page Headers
     if response["X-Pages"] == response["X-Page"]
@@ -250,11 +275,165 @@ class StrapResource
                                         "pages"  => response["X-Pages"],
                                         "next"   => response["X-Next-Page"]
                                     })
-
         @hasNext = true;
     end
 
     content = JSON.parse(response.body || "[]")
+  end
+
+  def post(params={})
+
+    details = self.pullMethod("POST")
+
+    # split part the uri to grab the path
+    parts = details["uri"].split($strapAPI)
+
+    my_path = parts[1]
+    method = details["method"]
+
+    if method != "POST"
+      return {"error"=>"method not allowed"}
+    end
+
+    # make the call
+    http = Net::HTTP.new(@uri, 443)
+    http.use_ssl = true
+    response = http.post(my_path, params.to_json, {"X-Auth-Token" => @token, "Content-Type" => "application/json"})
+
+    content = JSON.parse(response.body || "[]")
+  end
+
+  def put(params={})
+
+    details = self.pullMethod("PUT")
+
+    # split part the uri to grab the path
+    parts = details["uri"].split($strapAPI)
+
+    my_path = parts[1]
+    method = details["method"]
+
+    if method != "PUT"
+      return {"error"=>"method not allowed"}
+    end
+
+    # Replace of uri params
+    match = my_path.scan(/{([^{}]+)}/i)
+
+    # Store this for next()
+    @params = params
+
+    # Check the type of params
+    if  params && params.is_a?(String) # Check for only string
+        paramString = params
+        params = Hash.new()
+    end
+
+    # Matches returns 
+    # [ [ "guid" ] ]
+
+    # Handle all the URL strings
+    if match.length > 0
+
+      # Fix the Ruby return
+      match = match[0][0]
+
+      # Get valure to replace with or default to clear the param fir the uri
+      if paramString 
+        val = paramString
+      else
+        val = ( params.has_key?(match) ) ? params[match] : ""
+      end
+
+      puts val
+
+      # Do the actual replacement
+      my_path = my_path.gsub( "{" + match + "}", val)
+
+      # Remove the value from the params
+      if params.has_key?(match)
+          params.delete(match);
+      end
+
+    end
+
+    # make the call
+    http = Net::HTTP.new(@uri, 443)
+    http.use_ssl = true
+    response = http.request_put(my_path, params.to_json, {"X-Auth-Token" => @token, "Content-Type" => "application/json"})
+
+    content = JSON.parse(response.body || "[]")
+  end
+
+  def delete(params={})
+
+    details = self.pullMethod("DELETE")
+
+    # split part the uri to grab the path
+    parts = details["uri"].split($strapAPI)
+
+    my_path = parts[1]
+    method = details["method"]
+
+    if method != "DELETE"
+      return {"error"=>"method not allowed"}
+    end
+
+    # Replace of uri params
+    match = my_path.scan(/{([^{}]+)}/i)
+
+    # Store this for next()
+    @params = params
+
+    # Check the type of params
+    if  params && params.is_a?(String) # Check for only string
+        paramString = params
+        params = Hash.new()
+    end
+
+    # Matches returns 
+    # [ [ "guid" ] ]
+
+    # Handle all the URL strings
+    if match.length > 0
+
+      # Fix the Ruby return
+      match = match[0][0]
+
+      # Get valure to replace with or default to clear the param fir the uri
+      if paramString 
+        val = paramString
+      else
+        val = ( params.has_key?(match) ) ? params[match] : ""
+      end
+
+      puts val
+
+      # Do the actual replacement
+      my_path = my_path.gsub( "{" + match + "}", val)
+
+      # Remove the value from the params
+      if params.has_key?(match)
+          params.delete(match);
+      end
+
+    end
+
+    # make the call
+    http = Net::HTTP.new(@uri, 443)
+    http.use_ssl = true
+    response = http.delete(my_path, {"X-Auth-Token" => @token})
+
+    content = JSON.parse(response.body || "[]")
+  end
+
+  def pullMethod(type)
+    @details.each do |k, v|
+      if k["method"] == type
+        return k
+      end
+    end
+    return false
   end
   
 end
