@@ -47,18 +47,18 @@ strap.month.pageData # Contains the "page", "next", "pages", "per_page" informat
 strap.month.hasNext # Contains BOOL true || false if there is more data that can be pulled
 
 # Optional Param can be passed in as an array
-# strap.activity.get( {"day" => "YYYY-MM-DD", "guid" => "demo-strap"} )
+# strap.activity.get( {"date" => "YYYY-MM-DD", "guid" => "demo-strap"} )
 # URL resources can be passed as Strings or in the Array
 strap.activity.get( "demo-strap" )
 
 # Optional Param can be passed in as an array
-# strap.activity.get( {"day" => "YYYY-MM-DD", "guid" => "demo-strap"} )
+# strap.activity.get( {"date" => "YYYY-MM-DD", "guid" => "demo-strap"} )
 # URL resources can be passed as Strings or in the Array
 strap.activity.get( "demo-strap" )
 
 # Fetch a user's activity
 # URL resource: "guid"
-# Optional: "day", "count"
+# Optional: "date", "count"
 puts strap.activity.get({"guid" => "brian-test"})
 # Same as 
 puts strap.activity.get("brian-test")
