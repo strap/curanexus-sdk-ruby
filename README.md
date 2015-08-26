@@ -71,15 +71,32 @@ puts strap.behavior.get({"guid" => "brian-test"})
 puts strap.behavior.get("brian-test")
 
 # Fetch a list of micro-segmentation or specific segmentation job
-# URL resource: "jobId"
-# Optional: "jobId", "status"
+# URL resource: "id"
+# Optional: "id", "status"
 puts strap.job.get()
 
 # Create a micro-segmentation job
 # URL resource: none
 # Required: "name"
-# Optional: "description",, "guids" "startDate", "endDate", "notificationUrl" >> Guid is array of strings
+# Optional: "description", "guids" "startDate", "endDate", "notificationUrl" >> Guid is array of strings
 puts strap.job.post()
+
+# Update a micro-segmentation job
+# URL resource: "id"
+# Required: "id"
+# Optional: "name", "description"
+puts strap.job.put()
+
+# Delete a micro-segmentation job
+# URL resource: "id"
+# Required: "id"
+# Optional: none
+puts strap.job.delete()
+
+# Fetch a the data for a specific segmentation job
+# URL resource: "id"
+# Optional: "id"
+puts strap.job_data.get()
 
 # Fetch all user data for the month
 # URL resource: none
@@ -91,20 +108,60 @@ puts strap.month.get()
 # Optional: none
 puts strap.report.get("report - id value")
 
+# Fetch a report's food data
+# URL resource: "id"
+# Optional: none
+puts strap.report_food.get("report - id value")
+
 # Fetch a report's raw data
 # URL resource: "id"
 # Optional: none
-puts strap.raw.get("report - id value")
+puts strap.report_raw.get("report - id value")
+
+# Fetch a report's workout data
+# URL resource: "id"
+# Optional: none
+puts strap.report_workout.get("report - id value")
 
 # Fetch all user data for today
 # URL resource: none
 # Optional: "guid", "page", "per_page"
 puts strap.today.get()
 
+# Fetch a user trend information
+# URL resource: "guid"
+# Optional: none
+puts strap.trend.get({"guid" => "brian-test"})
+# Same as 
+puts strap.trend.get("brian-test")
+
+# Fetch a list of triggers or specific trigger
+# URL resource: "id"
+# Optional: "id", "key", "type", "actionType"
+puts strap.trigger.get()
+
+# Create a trigger
+# URL resource: none
+# Required: "active", "name", "type", "range", "conditions"
+# Optional: "actionType", "actionUrl"
+puts strap.trigger.post()
+
+# Update a micro-segmentation trigger
+# URL resource: "id"
+# Required: "id"
+# Optional: "active", "name", "type", "range", "conditions", "actionType", "actionUrl"
+puts strap.trigger.put()
+
+# Delete a micro-segmentation trigger
+# URL resource: "id"
+# Required: "id"
+# Optional: none
+puts strap.trigger.delete()
+
 # Fetch trigger data
 # URL resource: "id"
 # Optional: "count"
-puts strap.trigger.get()
+puts strap.trigger_data.get()
 
 # Fetch a simple user object
 # URL resource: "guid"
