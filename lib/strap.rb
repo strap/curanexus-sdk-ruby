@@ -270,7 +270,7 @@ class StrapResource
         val = ( params.has_key?(match) ) ? params[match] : ""
       end
 
-      puts val
+      #puts val
 
       # Do the actual replacement
       my_path = my_path.gsub( "{" + match + "}", val)
@@ -375,7 +375,7 @@ class StrapResource
         val = ( params.has_key?(match) ) ? params[match] : ""
       end
 
-      puts val
+      #puts val
 
       # Do the actual replacement
       my_path = my_path.gsub( "{" + match + "}", val)
@@ -437,7 +437,7 @@ class StrapResource
         val = ( params.has_key?(match) ) ? params[match] : ""
       end
 
-      puts val
+      #puts val
 
       # Do the actual replacement
       my_path = my_path.gsub( "{" + match + "}", val)
