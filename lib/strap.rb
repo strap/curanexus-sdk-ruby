@@ -18,11 +18,16 @@ class Strap
   @@activity = {}
   @@behavior = {}
   @@job = {}
+  @@job_data = {}
   @@month = {}
-  @@raw = {}
   @@report = {}
+  @@report_food = {}
+  @@report_raw = {}
+  @@report_workout = {}
   @@today = {}
+  @@trend = {}
   @@trigger = {}
+  @@trigger_data = {}
   @@user = {}
   @@users = {}
   @@week = {}
@@ -53,18 +58,28 @@ class Strap
         @@behavior = StrapResource.new( @@token, v )
       when "job"
         @@job = StrapResource.new( @@token, v )
+      when "job_data"
+        @@job_data = StrapResource.new( @@token, v )
       when "month"
         @@month = StrapResource.new( @@token, v )
-      when "raw"
-        @@raw = StrapResource.new( @@token, v )
       when "report"
         @@report = StrapResource.new( @@token, v )
+      when "report_food"
+        @@report_food = StrapResource.new( @@token, v )
+      when "report_raw"
+        @@report_raw = StrapResource.new( @@token, v )
+      when "report_workout"
+        @@report_workout = StrapResource.new( @@token, v )
       when "segmentation"
         @@segmentation = StrapResource.new( @@token, v )
       when "today"
         @@today = StrapResource.new( @@token, v )
+      when "trend"
+        @@trend = StrapResource.new( @@token, v )
       when "trigger"
         @@trigger = StrapResource.new( @@token, v )
+      when "trigger_data"
+        @@trigger_data = StrapResource.new( @@token, v )
       when "user"
         @@user = StrapResource.new( @@token, v )
       when "users"
@@ -91,19 +106,34 @@ class Strap
   def job 
     return @@job 
   end
+  def job_data 
+    return @@job_data 
+  end
   def month 
     return @@month 
-  end
-  def raw 
-    return @@raw 
   end
   def report 
     return @@report 
   end
+  def report_food
+    return @@report_food
+  end
+  def report_raw 
+    return @@report_raw 
+  end
+  def report_workout
+    return @@report_workout
+  end
   def today 
     return @@today 
   end
+  def trend 
+    return @@trend 
+  end
   def trigger 
+    return @@trigger 
+  end
+  def trigger_data
     return @@trigger 
   end
   def user 
@@ -240,7 +270,7 @@ class StrapResource
         val = ( params.has_key?(match) ) ? params[match] : ""
       end
 
-      puts val
+      #puts val
 
       # Do the actual replacement
       my_path = my_path.gsub( "{" + match + "}", val)
@@ -345,7 +375,7 @@ class StrapResource
         val = ( params.has_key?(match) ) ? params[match] : ""
       end
 
-      puts val
+      #puts val
 
       # Do the actual replacement
       my_path = my_path.gsub( "{" + match + "}", val)
@@ -407,7 +437,7 @@ class StrapResource
         val = ( params.has_key?(match) ) ? params[match] : ""
       end
 
-      puts val
+      #puts val
 
       # Do the actual replacement
       my_path = my_path.gsub( "{" + match + "}", val)
