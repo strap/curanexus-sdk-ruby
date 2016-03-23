@@ -110,17 +110,17 @@ puts strap.report.get("report - id value")
 
 # Fetch a report's food data
 # URL resource: "id"
-# Optional: none
+# Optional: "food"
 puts strap.report_food.get("report - id value")
 
 # Fetch a report's raw data
 # URL resource: "id"
-# Optional: none
+# Optional: "raw"
 puts strap.report_raw.get("report - id value")
 
 # Fetch a report's workout data
 # URL resource: "id"
-# Optional: none
+# Optional: "workout"
 puts strap.report_workout.get("report - id value")
 
 # Fetch all user data for today
@@ -129,8 +129,8 @@ puts strap.report_workout.get("report - id value")
 puts strap.today.get()
 
 # Fetch a user trend information
-# URL resource: "guid"
-# Optional: none
+# URL resource: none
+# Optional: "guid"
 puts strap.trend.get({"guid" => "brian-test"})
 # Same as 
 puts strap.trend.get("brian-test")
@@ -179,6 +179,11 @@ puts strap.users.get()
 # URL resource: none
 # Optional: "guid", "page", "per_page"
 puts strap.week.get()
+
+# Fetch word cloud for a project or user
+# URL resource: none
+# Optional: "guid"
+puts strap.wordcloud.get()
 
 
 ```
