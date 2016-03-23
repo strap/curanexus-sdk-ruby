@@ -31,6 +31,7 @@ class Strap
   @@user = {}
   @@users = {}
   @@week = {}
+  @@wordcloud = {}
 
   def initialize(token=false)
     if !token 
@@ -85,6 +86,8 @@ class Strap
       when "users"
         @@users = StrapResource.new( @@token, v )
       when "week"
+        @@week = StrapResource.new( @@token, v )
+      when "wordcloud"
         @@week = StrapResource.new( @@token, v )
       else
         #do nothing
@@ -144,6 +147,9 @@ class Strap
   end
   def week 
     return @@week 
+  end
+  def wordcloud 
+    return @@wordcloud 
   end
 
 end
