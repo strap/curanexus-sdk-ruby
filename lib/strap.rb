@@ -7,7 +7,7 @@ class Strap
   
   @@token = ""
 
-  $strapAPI = "api2.straphq.com"
+  $strapAPI = "api.curanexus.io"
   @@path = "/discover"
 
   @@apis = {}
